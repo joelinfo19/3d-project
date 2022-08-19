@@ -97,8 +97,8 @@ export const drawStar=(cx,cy,spikes,outerRadius,innerRadius)=>{
 }
 
 export const createFloor=()=>{
-    const planeGeometry = new THREE.PlaneGeometry( 20,20 );
-    const texturaPlano = new THREE.TextureLoader().load('./model/floor.jpg');
+    const planeGeometry = new THREE.PlaneGeometry( 40,40 );
+    const texturaPlano = new THREE.TextureLoader().load('./model/grass.jpg');
     const materialPlano = new THREE.MeshBasicMaterial({ map: texturaPlano, side: THREE.DoubleSide });
     const plane=new THREE.Mesh(planeGeometry, materialPlano);
     const plane2=new THREE.Mesh(planeGeometry, materialPlano);
@@ -116,11 +116,28 @@ export const createFloor=()=>{
 
     return [plane,plane2,plane3,plane4,plane5]
 }
+
+
+export const createFloor2=()=>{
+    const planeGeometry = new THREE.PlaneGeometry( 100,100 );
+    const texturaPlano = new THREE.TextureLoader().load('./model/grass.jpg');
+    const materialPlano = new THREE.MeshPhongMaterial({ map: texturaPlano, side: THREE.DoubleSide,color:0x293721 });
+    const plane=new THREE.Mesh(planeGeometry, materialPlano);
+    plane.rotation.x=Math.PI/2
+    return [plane]
+}
 export const cube=()=>{
     const geometry = new THREE.BoxGeometry( 1, 1, 1 );
     const material = new THREE.MeshBasicMaterial( {color:  Math.random() * 0xffffff,wireframe:false} );
     const cube = new THREE.Mesh( geometry, material );
     return cube
+}
+export const coneObject=()=>{
+    const geometry = new THREE.ConeGeometry( 3, 10, 28 );
+    const material = new THREE.MeshPhongMaterial( {color: 0x2D6A0A } );
+    const cone = new THREE.Mesh( geometry, material );
+    // scene.add( cone );
+    return cone
 }
 export const light=()=>{
     const ambientLight=new THREE.AmbientLight(0xffffff, 0.7)

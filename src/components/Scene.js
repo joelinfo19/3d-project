@@ -5,7 +5,7 @@ import { MeshBasicMaterial, Vector3 } from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'dat.gui'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader'
-import { createFloor, cube, drawCunia, drawStar, light, Star } from './Models'
+import { coneObject, createFloor, createFloor2, cube, drawCunia, drawStar, light, Star } from './Models'
 import { CharacterControls } from './Controls'
 import { scryRenderedComponentsWithType } from 'react-dom/test-utils'
 export const W = 'w'
@@ -44,7 +44,7 @@ export const Scene=()=>{
         const scene= new THREE.Scene()
         const camera= new THREE.PerspectiveCamera(
             25,
-            currentMount.clientWidth/currentMount.clientHeight,
+            currentMount.clientWidth/currentMount.clientWidth,
             0.01,
             1000
             )
@@ -71,6 +71,7 @@ export const Scene=()=>{
         const sphere = new THREE.Mesh( geometry, material );
 
         const [floor,floor2,...rest]=createFloor()
+        const [floorTest]=createFloor2()
         
         gltfLoader.load('./model/scene.gltf',(gltf)=>{
     
@@ -105,8 +106,14 @@ export const Scene=()=>{
             
         })
  
+        
+            const color = 0xFFFFFF;
+            const density = 0.05;
+            scene.fog = new THREE.FogExp2(color, density);
+          
         scene.add(axesHelper)
-        scene.add(floor);
+        scene.add(floorTest);
+       
         
         // const group=new THREE.Group()
         // const geometr = new THREE.BoxGeometry( 5,5,5 );
@@ -128,6 +135,12 @@ export const Scene=()=>{
             }
         }
         cont--
+    }
+    for(let i=0;i<20;i++){
+        const cone=coneObject()
+        cone.position.x+=i* Math.floor(Math.random() * 3) + -6
+        cone.position.z+=i* Math.floor(Math.random() * 3) + -6
+        scene.add(cone)
     }
         // scene.add(floor2);
         // const star=drawStar(18.6,28.6,5,5,3)
