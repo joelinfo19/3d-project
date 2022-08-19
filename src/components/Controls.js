@@ -20,7 +20,7 @@ export class CharacterControls {
     
     // temporary data
     walkDirection = new THREE.Vector3()
-    rotateAngle = new THREE.Vector3(0, 1, 0)
+    rotateAngle = new THREE.Vector3(0, -1,0 ) //add -
     rotateQuarternion= new THREE.Quaternion()
     cameraTarget = new THREE.Vector3()
     
@@ -29,10 +29,7 @@ export class CharacterControls {
     runVelocity = 5
     walkVelocity = 2
 
-    constructor(model,
-        mixer, animationsMap,
-        orbitControl, camera,
-        currentAction) {
+    constructor(model,mixer, animationsMap,orbitControl, camera,currentAction) {
         this.model = model
         this.mixer = mixer
         this.animationsMap = animationsMap
@@ -56,11 +53,11 @@ export class CharacterControls {
 
         var play = '';
         if (directionPressed && this.toggleRun) {
-            play = 'Run'
+            play = 'run'
         } else if (directionPressed) {
-            play = 'Walk'
+            play = 'walk'
         } else {
-            play = 'Idle'
+            play = 'idle'//idle
         }
 
         if (this.currentAction != play) {
@@ -75,7 +72,7 @@ export class CharacterControls {
 
         this.mixer.update(delta)
 
-        if (this.currentAction == 'Run' || this.currentAction == 'Walk') {
+        if (this.currentAction == 'run' || this.currentAction == 'walk') {
             // calculate towards camera direction
             var angleYCameraDirection = Math.atan2(
                     (this.camera.position.x - this.model.position.x), 
@@ -84,7 +81,9 @@ export class CharacterControls {
             var directionOffset = this.directionOffset(keysPressed)
 
             // rotate model
-            this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, angleYCameraDirection + directionOffset)
+            //add -
+            this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, -angleYCameraDirection + directionOffset)
+            // console.log(this.rotateQuarternion)
             this.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
 
             // calculate direction
@@ -94,12 +93,14 @@ export class CharacterControls {
             this.walkDirection.applyAxisAngle(this.rotateAngle, directionOffset)
 
             // run/walk velocity
-            const velocity = this.currentAction == 'Run' ? this.runVelocity : this.walkVelocity
+            const velocity = this.currentAction == 'run' ? this.runVelocity : this.walkVelocity
 
             // move model & camera
-            const moveX = this.walkDirection.x * velocity * delta
-            const moveZ = this.walkDirection.z * velocity * delta
+            //add -
+            const moveX = -this.walkDirection.x * velocity * delta   
+            const moveZ = -this.walkDirection.z * velocity * delta
             this.model.position.x += moveX
+            // this.model.position.y=1
             this.model.position.z += moveZ
             this.updateCameraTarget(moveX, moveZ)
         }
@@ -120,13 +121,13 @@ export class CharacterControls {
      directionOffset(keysPressed) {
         var directionOffset = 0 // w
 
-        if (keysPressed[W]) {
+        if (keysPressed[S]) { // change s by w
             if (keysPressed[A]) {
                 directionOffset = Math.PI / 4 // w+a
             } else if (keysPressed[D]) {
                 directionOffset = - Math.PI / 4 // w+d
             }
-        } else if (keysPressed[S]) {
+        } else if (keysPressed[W]) {  //change w by s
             if (keysPressed[A]) {
                 directionOffset = Math.PI / 4 + Math.PI / 2 // s+a
             } else if (keysPressed[D]) {

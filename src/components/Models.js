@@ -116,6 +116,12 @@ export const createFloor=()=>{
 
     return [plane,plane2,plane3,plane4,plane5]
 }
+export const cube=()=>{
+    const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    const material = new THREE.MeshBasicMaterial( {color:  Math.random() * 0xffffff,wireframe:false} );
+    const cube = new THREE.Mesh( geometry, material );
+    return cube
+}
 export const light=()=>{
     const ambientLight=new THREE.AmbientLight(0xffffff, 0.7)
     // scene.add(ambientLight)
@@ -133,3 +139,4 @@ export const light=()=>{
     dirLight.shadow.mapSize.height = 4096;
     return [dirLight,ambientLight]
 }
+

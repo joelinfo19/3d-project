@@ -1,12 +1,13 @@
 import { render } from '@testing-library/react'
 import React, { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
-import { MeshBasicMaterial } from 'three'
+import { MeshBasicMaterial, Vector3 } from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'dat.gui'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader'
-import { createFloor, drawCunia, drawStar, light, Star } from './Models'
+import { createFloor, cube, drawCunia, drawStar, light, Star } from './Models'
 import { CharacterControls } from './Controls'
+import { scryRenderedComponentsWithType } from 'react-dom/test-utils'
 export const W = 'w'
 export const A = 'a'
 export const S = 's'
@@ -58,7 +59,9 @@ export const Scene=()=>{
       
         let characterControls
         camera.position.set(5,2,10)
+       
       
+
         const [dirLight,ambientLight]  = light()  
         scene.add(ambientLight)
         scene.add(dirLight)
@@ -69,11 +72,14 @@ export const Scene=()=>{
 
         const [floor,floor2,...rest]=createFloor()
         
-        gltfLoader.load('./model/Soldier.glb',(gltf)=>{
+        gltfLoader.load('./model/scene.gltf',(gltf)=>{
+    
             // fbx.scale.setScalar(0.01);
             loadedModel=gltf
             const model =gltf.scene
             const gltfAnimations=gltf.animations
+            // model.scale.set(0.02,0.02,0.02)
+            model.position.y=1.2
 
             model.traverse(function(child){
                 if(child.isMesh) child.castShadow=true   
@@ -86,49 +92,12 @@ export const Scene=()=>{
             let action
             let action2
             const animationsMap = new Map()
-            gltfAnimations.filter(a => a.name != 'TPose').forEach((a) => {
+            gltfAnimations.filter(a => a.name != 't-pose').forEach((a) => {
                 animationsMap.set(a.name, mixer.clipAction(a))
             })
         
-            characterControls = new CharacterControls(model, mixer, animationsMap, orbit, camera,  'Idle')
-            // document.addEventListener('keydown',(e)=>{
-            //     // const clip1 = THREE.AnimationClip.findByName( gltfAnimations, 'Walk' )
+            characterControls = new CharacterControls(model, mixer, animationsMap, orbit, camera,  'idle')
 
-            //     // action.reset()
-            //     // action.play()
-            //     if(e.key=='w'){
-                    
-            //         const clip = THREE.AnimationClip.findByName( gltfAnimations, 'Run' )
-            //         action = mixer.clipAction( clip );
-            //         // action.stop()
-            //         // action.reset()
-            //         action.play()
-            //     }
-            //     if(e.key=='e'){
-            //         action.stop()
-            //         const clip = THREE.AnimationClip.findByName( gltfAnimations, 'Walk' )
-            //         action = mixer.clipAction( clip );
-            //         // action.reset()
-            //         action.play()
-
-            //     }
-                
-            // },true)
-               
-            // document.addEventListener('keyup',(e)=>{
-            //     action.stop()
-            //     const clip = THREE.AnimationClip.findByName( gltfAnimations, 'Idle' );
-            //     action = mixer.clipAction( clip );
-            //     action.play()
-            //     // const clip2 = THREE.AnimationClip.findByName( gltfAnimations, 'TPose' );
-            //     // action = mixer.clipAction( clip2 );
-            //     // action.play()
-            //     console.log(e)
-                
-            // },true)
-            // const clip = THREE.AnimationClip.findByName( gltfAnimations, 'Idle' );
-            // action = mixer.clipAction( clip );
-            // action.play()
            
             
     
@@ -138,12 +107,45 @@ export const Scene=()=>{
  
         scene.add(axesHelper)
         scene.add(floor);
+        
+        // const group=new THREE.Group()
+        // const geometr = new THREE.BoxGeometry( 5,5,5 );
+        // const materia = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+        // const maxCube = new THREE.Mesh(geometr, materia);
+        // const cub
+        let cont=7;
+        const newCube=cube()
+    for(let i = 0;i<7;i++){
+        for(let j=i;j<cont;j++){
+            for(let k=i;k<cont;k++){
+                const newCube=cube()
+                newCube.position.x+=j*1.2
+                newCube.position.z+=k*1.2
+                newCube.position.y=0.5
+                newCube.position.y+=i*1.2
+                console.log(newCube.position.y)
+                scene.add(newCube)
+            }
+        }
+        cont--
+    }
         // scene.add(floor2);
+        // const star=drawStar(18.6,28.6,5,5,3)
+        
+        const star=drawStar(0,0,5,5,3)        // star.rotation.x=0.01
+        star.position.set(3.6,6,3.6)
+        scene.add(star)
+        // scene.add(newCube)
+        scene.add( sphere );
+        // scene.add(cube2)
+                // scene.add(cube3)
+        
 
-        // scene.add(Star())
-        // scene.add(drawCunia())
-        // scene.add( sphere );
-        // sphere.position.x=1.5;
+        star.scale.set(0.2,0.2,0.2)
+        sphere.position.x=-1.5;
+        sphere.scale.set(0.2,0.2,0.2)
+        sphere.position.y=1.5;
+        sphere.position.z=1.5;
         
         const gui=new dat.GUI()
         const options={
@@ -164,14 +166,19 @@ export const Scene=()=>{
             } else {
                 (map )[event.key.toLowerCase()] = true
             }
-        }, false);
+        }, true);
         document.addEventListener('keyup', (event) => {
             // keyDisplayQueue.up(event.key);
             (map )[event.key.toLowerCase()] = false
-        }, false);
+        }, true);
         
         const animate=()=>{
             const elapsedTime=clock.getElapsedTime()
+            star.rotateY(0.1)
+            // sphere.rotateY(0.004)
+            // newCube.rotateY(0.004)
+            // star.position.set(18.6,28.6,3.6)
+            
             // let mixerTime=clock.getDelta()
             // mixerTime+=0.02
             // // cube.position.z=Math.sin(elapsedTime)
@@ -190,11 +197,11 @@ export const Scene=()=>{
             //     // console.log(clock.getDelta())
             // }
             let mixerUpdateDelta = clock.getDelta();
-            mixerUpdateDelta+=0.01
+            mixerUpdateDelta+=0.02
             if (characterControls) {
                 characterControls.update(mixerUpdateDelta, map);
             }
-                
+            
             orbit.update()
             renderer.render(scene,camera)
             // requestAnimationFrame(animate)
