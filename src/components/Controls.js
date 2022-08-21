@@ -17,17 +17,20 @@ export class CharacterControls {
     // state
     toggleRun= true
     currentAction
-    
+    flag=true
     // temporary data
     walkDirection = new THREE.Vector3()
     rotateAngle = new THREE.Vector3(0, -1,0 ) //add -
     rotateQuarternion= new THREE.Quaternion()
     cameraTarget = new THREE.Vector3()
     
+    
     // constants
     fadeDuration = 0.2
     runVelocity = 5
     walkVelocity = 2
+    position= new THREE.Vector3(2,0.5,1) //position of danger cube
+    // position.add()
 
     constructor(model,mixer, animationsMap,orbitControl, camera,currentAction) {
         this.model = model
@@ -41,16 +44,22 @@ export class CharacterControls {
         })
         this.orbitControl = orbitControl
         this.camera = camera
+       
+    
         this.updateCameraTarget(0,0)
     }
 
      switchRunToggle() {
         this.toggleRun = !this.toggleRun
     }
+    hola(play){
+        this.model.position.set(0,0,0)
+
+    }
 
      update(delta, keysPressed) {
         const directionPressed = DIRECTIONS.some(key => keysPressed[key] == true)
-
+        this.flag=true
         var play = '';
         if (directionPressed && this.toggleRun) {
             play = 'run'
@@ -59,8 +68,17 @@ export class CharacterControls {
         } else {
             play = 'idle'//idle
         }
+        const newDistance=this.position.distanceToSquared(this.model.position)
 
+        // console.log(play)
+        if(newDistance<1){
+            // console.log(newDistance)ss
+            this.model.position.set(0,1.2,0)
+            play='idle'
+            this.flag=false
+        }
         if (this.currentAction != play) {
+            // console.log(this.currentAction)
             const toPlay = this.animationsMap.get(play)
             const current = this.animationsMap.get(this.currentAction)
 
@@ -68,10 +86,11 @@ export class CharacterControls {
             toPlay.reset().fadeIn(this.fadeDuration).play();
 
             this.currentAction = play
+            console.log(this.currentAction)
         }
-
         this.mixer.update(delta)
-
+        
+        
         if (this.currentAction == 'run' || this.currentAction == 'walk') {
             // calculate towards camera direction
             var angleYCameraDirection = Math.atan2(
@@ -93,16 +112,73 @@ export class CharacterControls {
             this.walkDirection.applyAxisAngle(this.rotateAngle, directionOffset)
 
             // run/walk velocity
-            const velocity = this.currentAction == 'run' ? this.runVelocity : this.walkVelocity
+            
+            let velocity = this.currentAction == 'run' ? this.runVelocity : this.walkVelocity
 
             // move model & camera
             //add -
+            
+            console.log(this.currentAction)
+            if(newDistance<1){
+                // console.log(newDistance)
+                velocity=this.walkVelocity
+                
+            }
             const moveX = -this.walkDirection.x * velocity * delta   
             const moveZ = -this.walkDirection.z * velocity * delta
             this.model.position.x += moveX
             // this.model.position.y=1
             this.model.position.z += moveZ
+            // console.log(this.position)
+            // console.log(this.model.position)
+            
             this.updateCameraTarget(moveX, moveZ)
+    
+        
+        // this.mixer.update(delta)
+        
+        // if (this.currentAction == 'run' || this.currentAction == 'walk') {
+        //     // calculate towards camera direction
+        //     var angleYCameraDirection = Math.atan2(
+        //             (this.camera.position.x - this.model.position.x), 
+        //             (this.camera.position.z - this.model.position.z))
+        //     // diagonal movement angle offset
+        //     var directionOffset = this.directionOffset(keysPressed)
+
+        //     // rotate model
+        //     //add -
+        //     this.rotateQuarternion.setFromAxisAngle(this.rotateAngle, -angleYCameraDirection + directionOffset)
+        //     // console.log(this.rotateQuarternion)
+        //     this.model.quaternion.rotateTowards(this.rotateQuarternion, 0.2)
+
+        //     // calculate direction
+        //     this.camera.getWorldDirection(this.walkDirection)
+        //     this.walkDirection.y = 0
+        //     this.walkDirection.normalize()
+        //     this.walkDirection.applyAxisAngle(this.rotateAngle, directionOffset)
+
+        //     // run/walk velocity
+            
+        //     let velocity = this.currentAction == 'run' ? this.runVelocity : this.walkVelocity
+
+        //     // move model & camera
+        //     //add -
+            
+        //     console.log(this.currentAction)
+        //     if(newDistance<1){
+        //         // console.log(newDistance)
+        //         velocity=this.walkVelocity
+                
+        //     }
+        //     const moveX = -this.walkDirection.x * velocity * delta   
+        //     const moveZ = -this.walkDirection.z * velocity * delta
+        //     this.model.position.x += moveX
+        //     // this.model.position.y=1
+        //     this.model.position.z += moveZ
+        //     // console.log(this.position)
+        //     // console.log(this.model.position)
+            
+        //     this.updateCameraTarget(moveX, moveZ)
         }
     }
 

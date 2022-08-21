@@ -5,7 +5,7 @@ import { MeshBasicMaterial, Vector3 } from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'dat.gui'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader'
-import { coneObject, createFloor, createFloor2, cube, drawCunia, drawStar, light, Star } from './Models'
+import { coneObject, createFloor, createFloor2, cube, drawCunia, drawStar, light, mandelBrot, Star } from './Models'
 import { CharacterControls } from './Controls'
 import { scryRenderedComponentsWithType } from 'react-dom/test-utils'
 export const W = 'w'
@@ -18,9 +18,10 @@ export const DIRECTIONS = [W, A, S, D]
 export const Scene=()=>{
     // const [key,useKey]=useState()
     const mountRef= useRef(null)
+    const [isVisible,setIsVisible]=useState(false)
     // let bool=true;
-    const KeyboardPress=(e)=>{
-       console.log(e.key)
+    const handleButton=(e)=>{
+       setIsVisible(false)
 
     
 
@@ -40,6 +41,7 @@ export const Scene=()=>{
 
         
         renderer.setSize(currentMount.clientWidth,currentMount.clientHeight)
+        const window=[currentMount.clientWidth,currentMount.clientHeight]
         currentMount.appendChild(renderer.domElement)
         const scene= new THREE.Scene()
         const camera= new THREE.PerspectiveCamera(
@@ -72,7 +74,20 @@ export const Scene=()=>{
 
         const [floor,floor2,...rest]=createFloor()
         const [floorTest]=createFloor2()
-        
+        // const Cube=cube()
+        //fractal mandelBrot
+        // const fractal=mandelBrot(currentMount.clientWidth/currentMount.clientHeight,window[0],window[1])
+        const cubes=[]
+        for(let i=0; i<5;i++){
+            const newCube=cube()
+            newCube.position.x+=i
+            cubes[i]=newCube
+            scene.add(newCube)
+            console.log(cubes[i].position)
+
+        }
+
+        let flag
         gltfLoader.load('./model/scene.gltf',(gltf)=>{
     
             // fbx.scale.setScalar(0.01);
@@ -85,6 +100,7 @@ export const Scene=()=>{
             model.traverse(function(child){
                 if(child.isMesh) child.castShadow=true   
             })
+            console.log(model.position)
             scene.add(model)
             mixer=new THREE.AnimationMixer(model)
             console.log(gltfAnimations)
@@ -98,60 +114,122 @@ export const Scene=()=>{
             })
         
             characterControls = new CharacterControls(model, mixer, animationsMap, orbit, camera,  'idle')
-
+            flag=characterControls.flag
+           
            
             
     
            
             
         })
+       
  
-        
             const color = 0xFFFFFF;
             const density = 0.05;
-            scene.fog = new THREE.FogExp2(color, density);
+            // scene.fog = new THREE.FogExp2(color, density);
           
         scene.add(axesHelper)
         scene.add(floorTest);
+        // for(let i; i<5;i++){
+        //     const newCube=cube()
+        //     newCube.position.x+=i
+        //     // cubes[i]=newCube
+        //     scene.add(newCube)
+        //     console.log("cubes[i].position")
+
+        // }
+        //fractal mandelbrot
+        // scene.add(fractal)
        
-        
-        // const group=new THREE.Group()
-        // const geometr = new THREE.BoxGeometry( 5,5,5 );
-        // const materia = new THREE.MeshBasicMaterial( {color: 0xffffff} );
-        // const maxCube = new THREE.Mesh(geometr, materia);
-        // const cub
-        let cont=7;
-        const newCube=cube()
-    for(let i = 0;i<7;i++){
-        for(let j=i;j<cont;j++){
-            for(let k=i;k<cont;k++){
-                const newCube=cube()
-                newCube.position.x+=j*1.2
-                newCube.position.z+=k*1.2
-                newCube.position.y=0.5
-                newCube.position.y+=i*1.2
-                console.log(newCube.position.y)
-                scene.add(newCube)
+/* fractal Triangle 
+        function drawLine(p0, p1, color="black") {
+            const shape = new THREE.Shape();
+
+            const extrudeSettings = {
+                amount : 1,
+                depth: 5,
+                bevelEnabled:false,
+                bevelSegments:7,
+                bevelSize:0.1,
+                bevelOffSet:1,
+                steps:5,
+                bevelThickness:1
+            };
+            shape.moveTo(p0.x,p0.y)
+            shape.lineTo(p1.x,p1.y)
+            const starGeometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+            const starMaterial = new THREE.MeshNormalMaterial( { color: 0xDDEAD5 ,wireframe:false} );
+            const mesh = new THREE.Mesh( starGeometry, starMaterial ) ;
+            scene.add(mesh)
+        }
+
+        function drawTriangle(p0, p1, p2) {
+            drawLine(p0, p1)
+            drawLine(p1, p2)
+            drawLine(p2, p0)
+        }
+
+        function drawFract(p0, p1, p2, limit){
+            if(limit > 0){
+                const pA = {
+                        x: p0.x + (p1.x - p0.x)/2,
+                        y: p0.y - (p0.y - p1.y)/2
+                    },
+                    pB = {
+                        x: p1.x + (p2.x - p1.x)/2,
+                        y: p1.y - (p1.y - p2.y)/2
+                    },
+                    pC = {
+                        x: p0.x + (p2.x - p0.x)/2,
+                        y: p0.y
+                    };
+
+                drawFract(p0, pA, pC, limit-1);
+                drawFract(pA, p1, pB, limit-1);
+                drawFract(pC, pB, p2, limit-1);
+            }
+            else{
+                drawTriangle(p0,p1,p2);
             }
         }
-        cont--
-    }
-    for(let i=0;i<20;i++){
-        const cone=coneObject()
-        cone.position.x+=i* Math.floor(Math.random() * 3) + -6
-        cone.position.z+=i* Math.floor(Math.random() * 3) + -6
-        scene.add(cone)
-    }
+        // drawFract({x: -50, y:50},{x:0, y:120},  {x:50, y:50}, 6)
+        */
+    //     let cont=7;
+    // for(let i = 0;i<7;i++){
+    //     for(let j=i;j<cont;j++){
+    //         for(let k=i;k<cont;k++){
+    //             const newCube=cube()
+    //             newCube.position.x+=j*1.2
+    //             newCube.position.z+=k*1.2
+    //             newCube.position.y=0.5
+    //             newCube.position.y+=i*1.2
+    //             console.log(newCube.position.y)
+    //             scene.add(newCube)
+    //         }
+    //     }
+    //     cont--
+    // }
+    // for(let i=0;i<20;i++){
+    //     const cone=coneObject()
+    //     cone.position.x+=i* Math.floor(Math.random() * 3) + -6
+    //     cone.position.z+=i* Math.floor(Math.random() * 3) + -6
+    //     scene.add(cone)
+    // }
         // scene.add(floor2);
         // const star=drawStar(18.6,28.6,5,5,3)
         
         const star=drawStar(0,0,5,5,3)        // star.rotation.x=0.01
         star.position.set(3.6,6,3.6)
-        scene.add(star)
+        // scene.add(star)
         // scene.add(newCube)
         scene.add( sphere );
+        // Cube.position.set(2,0.5,1)
+        
+        // scene.add(Cube)
         // scene.add(cube2)
-                // scene.add(cube3)
+        // scene.add(cube3)
+        // console.log(Cube.position)
+    
         
 
         star.scale.set(0.2,0.2,0.2)
@@ -209,9 +287,16 @@ export const Scene=()=>{
             //     mixer.update(mixerTime)
             //     // console.log(clock.getDelta())
             // }
+            // console.log(flag)
+            
             let mixerUpdateDelta = clock.getDelta();
             mixerUpdateDelta+=0.02
             if (characterControls) {
+                // console.log(characterControls.flag)
+                if(!characterControls.flag){
+                    setIsVisible(true)
+                }
+                
                 characterControls.update(mixerUpdateDelta, map);
             }
             
@@ -233,12 +318,21 @@ export const Scene=()=>{
         }
     },[])
     return(
-        <div
+
+         <div
             // className='Container3D'
             ref={mountRef}
-            style={{width:'100%',height:'100vh'}}
+            style={{width:'100%',height:'100vh',display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'}}
+            
         >
-
+            <button id='end' style={{visibility:isVisible?'visible':'hidden'}} onClick={handleButton}>
+                    Try again
+            </button>
         </div>
+
+       
+        
     )
 }
