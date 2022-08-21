@@ -80,12 +80,14 @@ export const Scene=()=>{
         const cubes=[]
         for(let i=0; i<5;i++){
             const newCube=cube()
-            newCube.position.x+=i
+            newCube.position.x=-2
+            newCube.position.x-=i*2
             cubes[i]=newCube
             scene.add(newCube)
-            console.log(cubes[i].position)
+            // console.log(cubes[i].position)
 
         }
+        // console.log(cubes[0])
 
         let flag
         gltfLoader.load('./model/scene.gltf',(gltf)=>{
@@ -113,7 +115,7 @@ export const Scene=()=>{
                 animationsMap.set(a.name, mixer.clipAction(a))
             })
         
-            characterControls = new CharacterControls(model, mixer, animationsMap, orbit, camera,  'idle')
+            characterControls = new CharacterControls(model, mixer, animationsMap, orbit, camera,  'idle',cubes)
             flag=characterControls.flag
            
            
@@ -125,7 +127,7 @@ export const Scene=()=>{
        
  
             const color = 0xFFFFFF;
-            const density = 0.05;
+            const density = 0.1;
             // scene.fog = new THREE.FogExp2(color, density);
           
         scene.add(axesHelper)

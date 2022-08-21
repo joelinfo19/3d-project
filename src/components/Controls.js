@@ -30,12 +30,14 @@ export class CharacterControls {
     runVelocity = 5
     walkVelocity = 2
     position= new THREE.Vector3(2,0.5,1) //position of danger cube
+    dangerCubes
     // position.add()
 
-    constructor(model,mixer, animationsMap,orbitControl, camera,currentAction) {
+    constructor(model,mixer, animationsMap,orbitControl, camera,currentAction,dangerCubes) {
         this.model = model
         this.mixer = mixer
         this.animationsMap = animationsMap
+        this.dangerCubes=dangerCubes
         this.currentAction = currentAction
         this.animationsMap.forEach((value, key) => {
             if (key == currentAction) {
@@ -70,13 +72,23 @@ export class CharacterControls {
         }
         const newDistance=this.position.distanceToSquared(this.model.position)
 
-        // console.log(play)
-        if(newDistance<1){
-            // console.log(newDistance)ss
-            this.model.position.set(0,1.2,0)
-            play='idle'
-            this.flag=false
+        // console.log(newDistance)
+        for(let i=0;i<this.dangerCubes.length;i++){
+            // console.log(this.dangerCubes[i].position.distanceToSquared(this.model.position))
+            if(this.dangerCubes[i].position.distanceToSquared(this.model.position)<2){
+                console.log('into')
+                this.model.position.set(0,1.2,0)
+                play='idle'
+                // this.flag=false
+            }
         }
+        // if(newDistance<1){
+        //     // console.log(newDistance)ss
+        //     this.model.position.set(0,1.2,0)
+        //     play='idle'
+        //     this.flag=false
+        //     console.log(this.dangerCubes)
+        // }
         if (this.currentAction != play) {
             // console.log(this.currentAction)
             const toPlay = this.animationsMap.get(play)
