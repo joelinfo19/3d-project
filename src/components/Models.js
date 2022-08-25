@@ -148,8 +148,16 @@ export const cubeInstanced=()=>{
   const geometry = new THREE.BoxGeometry( 1, 1, 1 );
   const material = new THREE.MeshBasicMaterial( {wireframe:false} );
 
-  material.map=new THREE.TextureLoader().load('./model/eyes_diffuse_jpeg.jpg')
-  const cube = new THREE.InstancedMesh( geometry, material,3);
+  material.map=new THREE.TextureLoader().load('./model/eye_sauron.jpg')
+  const cube = new THREE.InstancedMesh( geometry, material,20);
+  return cube
+}
+export const cubeInstancedReduce=()=>{
+  const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+  const material = new THREE.MeshBasicMaterial( {wireframe:false} );
+
+  material.map=new THREE.TextureLoader().load('./model/grass.jpg')
+  const cube = new THREE.InstancedMesh( geometry, material,30);
   return cube
 }
 export const coneObject=()=>{

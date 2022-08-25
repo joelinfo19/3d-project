@@ -5,7 +5,7 @@ import { MathUtils, MeshBasicMaterial, PMREMGenerator, Vector3 } from 'three'
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'dat.gui'
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader'
-import { coneObject, createFloor, createFloor2, cube, cubeInstanced, drawCunia, drawStar, light, mandelBrot, Star } from './Models'
+import { coneObject, createFloor, createFloor2, cube, cubeInstanced, cubeInstancedReduce, drawCunia, drawStar, light, mandelBrot, Star } from './Models'
 import { CharacterControls } from './Controls'
 import { scryRenderedComponentsWithType } from 'react-dom/test-utils'
 import { Sky } from 'three/examples/jsm/objects/Sky';
@@ -67,7 +67,8 @@ export const Scene=()=>{
         camera.position.set(5,2,10)
        
       
-
+        const vertex = new THREE.Vector3();
+        const color50 = new THREE.Color();
         const [dirLight,ambientLight]  = light()  
         console.log(renderer.toneMapping)
         scene.add(ambientLight)
@@ -81,7 +82,7 @@ export const Scene=()=>{
         const [floorTest]=createFloor2()
         const sky=new Sky()
         sky.scale.setScalar( 450000 );  
-        scene.add( sky );
+        // scene.add( sky );
         const skyUniforms = sky.material.uniforms;
         skyUniforms['turbidity'].value = 10;
         skyUniforms['rayleigh'].value = 3;
@@ -90,7 +91,7 @@ export const Scene=()=>{
         // skyUniforms['exposure'].value = 0.1273;
         let sun = new THREE.Vector3();
         const parameters = {
-            elevation: 1,
+            elevation: 0,
             azimuth: 170
         };
         function generateRandom(min, max) {
@@ -113,11 +114,79 @@ export const Scene=()=>{
         // const Cube=cube()
         //fractal mandelBrot
         // const fractal=mandelBrot(currentMount.clientWidth/currentMount.clientHeight,window[0],window[1])
+        const newCubeInstancedReduce=cubeInstancedReduce()
+        const cubesReduce=newCubeInstancedReduce
+        let dummyReduce = new THREE.Object3D();
+
+        for(let i=0; i<newCubeInstancedReduce.count;i++){
+            
+            // const random=Math.random() * (13-2) + 2
+            // newCubeInstanced.position.x=-3
+            // // console.log(newCube.position.x)
+            // // console.log(random)
+            // newCubeInstanced.position.x-=((i* (random))/2)
+            // newCubeInstanced.position.y=0.5
+            // // newCube.position.z=-3
+            
+            // console.log(newCubeInstanced.position.x)
+            
+            var xStaticPosition = -5 * (i + 1)
+            
+            dummyReduce.position.set(generateRandom(-15, 15), 0.7, generateRandom(-15, 15));
+            dummyReduce.updateMatrix();
+            newCubeInstancedReduce.setMatrixAt( i, dummyReduce.matrix );
+            // newCubeInstanced.getMatrixAt( i, matrix );
+            // console.log(position.setFromMatrixPosition( matrix ))
+            // console.log(newCubeInstanced[i].position.x)
+            // console.log(cubes[i].position)
+            // cubes[i]=newCubeInstanced
+        }
        
+        scene.add(newCubeInstancedReduce)
         const newCubeInstanced=cubeInstanced()
         const cubes=newCubeInstanced
         let dummy = new THREE.Object3D();
         
+				let floorGeometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
+				floorGeometry.rotateX( - Math.PI / 2 );
+
+				// vertex displacement
+
+				let position = floorGeometry.attributes.position;
+
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					vertex.fromBufferAttribute( position, i );
+
+					vertex.x += Math.random() * 20 - 10;
+					vertex.y += Math.random() * 2;
+					vertex.z += Math.random() * 20 - 10;
+
+					position.setXYZ( i, vertex.x, vertex.y, vertex.z );
+
+				}
+
+				floorGeometry = floorGeometry.toNonIndexed(); // ensure each face has unique vertices
+
+				position = floorGeometry.attributes.position;
+				const colorsFloor = [];
+
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					// color50.setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
+					color50.setHSL(  Math.random() * 0.1, 0.75, 0.48 );
+                    
+					colorsFloor.push( color50.r, color50.g, color50.b );
+
+				}
+
+				floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsFloor, 3 ) );
+
+				const floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+
+				const floor50 = new THREE.Mesh( floorGeometry, floorMaterial );
+				scene.add( floor50 );
+                floor50.position.y=-1.5
         for(let i=0; i<newCubeInstanced.count;i++){
             
             // const random=Math.random() * (13-2) + 2
@@ -247,7 +316,7 @@ export const Scene=()=>{
                 animationsMap.set(a.name, mixer.clipAction(a))
             })
         
-            characterControls = new CharacterControls(model, mixer, animationsMap, orbit, camera,  'idle',cubes,cube1BB)
+            characterControls = new CharacterControls(model, mixer, animationsMap, orbit, camera,  'idle',cubes,cube1BB,cubesReduce)
             flag=characterControls.flag
            
            
@@ -256,19 +325,22 @@ export const Scene=()=>{
            
             
         })
-        // gltfLoader2.load('./model/textures2/scene.gltf',(gltf)=>{
-        //     const model =gltf.scene
-        //      model.scale.set(1,1,1)
-        //      model.position.y=3
-        //      model.position.z=3
-        //      console.log(model.position)
-        //     scene.add(model)
+        gltfLoader2.load('./model/textures3/scene.gltf',(gltf)=>{
+            const model =gltf.scene
+             model.scale.set(200,200,200)
+             model.position.y=17.5
+             model.position.x=-25
+             model.position.z=-45
+             model.rotateY(30* Math.PI/180)
+             console.log(model.position)
+            scene.add(model)
 
-        // })
+        })
  
-            const color = 0xFFFFFF;
-            const density = 0.1;
-            // scene.fog = new THREE.FogExp2(color, density);
+            const color = 0xDFE9F3;
+            const density = 0.05;
+            scene.background = new THREE.Color( color );
+            scene.fog = new THREE.FogExp2(color, density);
             const size = 50;
             const divisions = 50;
             
@@ -369,7 +441,7 @@ export const Scene=()=>{
 
 
         scene.add(axesHelper)
-        scene.add(floorTest); 
+        // scene.add(floorTest); 
         // for(let i; i<5;i++){
         //     const newCube=cube()
         //     newCube.position.x+=i

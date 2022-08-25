@@ -32,15 +32,19 @@ export class CharacterControls {
     position= new THREE.Vector3(2,0.5,1) //position of danger cube
     dangerCubes
     cube1
+    reduceCubes
     matrix=new THREE.Matrix4()
     position1=new THREE.Vector3()
+    matrix2=new THREE.Matrix4()
+    position2=new THREE.Vector3()
     // position.add()
 
-    constructor(model,mixer, animationsMap,orbitControl, camera,currentAction,dangerCubes,cube) {
+    constructor(model,mixer, animationsMap,orbitControl, camera,currentAction,dangerCubes,cube,reduceCubes) {
         this.model = model
         this.mixer = mixer
         this.animationsMap = animationsMap
         this.dangerCubes=dangerCubes
+        this.reduceCubes=reduceCubes
         this.cube1=cube
         this.currentAction = currentAction
         this.animationsMap.forEach((value, key) => {
@@ -75,7 +79,7 @@ export class CharacterControls {
             play = 'idle'//idle
         }
         const newDistance=this.position.distanceToSquared(this.model.position)
-
+       // const newDistance2=this.position.distanceToSquared(this.model.position)
         // console.log(this.dangerCubes.length)
         for(let i=0;i<this.dangerCubes.count;i++){
             // console.log(this.dangerCubes[i].position.distanceToSquared(this.model.position))
@@ -142,13 +146,28 @@ export class CharacterControls {
             //add -
             
             console.log(this.currentAction)
-            
+            for(let i=0;i<this.reduceCubes.count;i++){
+                // console.log(this.dangerCubes[i].position.distanceToSquared(this.model.position))
+                this.reduceCubes.getMatrixAt( i, this.matrix2 );
+                this.position2.setFromMatrixPosition( this.matrix2 )
+                // console.log(position.setFromMatrixPosition( matrix ))
+                // console.log(this.position1.setFromMatrixPosition( this.matrix ))
+                if( this.position2.setFromMatrixPosition( this.matrix2 ).distanceToSquared(this.model.position)<1){
+                    // console.log(this.dangerCubes[i].position.x)
+                    // console.log(this.dangerCubes[i])
+                    // console.log(this.position1.setFromMatrixPosition( this.matrix ))
+                    console.log(this.position2.setFromMatrixPosition( this.matrix2 ).distanceToSquared(this.model.position))
+                    velocity=this.walkVelocity
+                    // this.flag=false
+                }
+            }
             const moveX = -this.walkDirection.x * velocity * delta   
             const moveZ = -this.walkDirection.z * velocity * delta
             this.model.position.x += moveX
             // this.model.position.y=1
             this.model.position.z += moveZ
             console.log(this.cube1)
+            //for put barrers
             if(newDistance<1.5&&this.model.position.x>=this.cube1.min.x&&this.model.position.x<=this.cube1.max.x){
                 // console.log(newDistance)
                 velocity=this.walkVelocity
@@ -168,6 +187,7 @@ export class CharacterControls {
                 };
                 this.model.position.x=clamp(this.model.position.x, this.cube1.min.x, this.cube1.max.x);
             }
+            
             // console.log(newDistance)
             // console.log(this.cube1.position.x)
             // console.log(this.position)
@@ -177,8 +197,8 @@ export class CharacterControls {
             // const clamp = (num, min, max) => Math.min(Math.min(num, min), max);
             // const clamp1 = (num, min, max) => Math.min(Math.min(num, min), max);
 
-            this.model.position.x=clamp(this.model.position.x, -30, 10);
-            this.model.position.z=clamp1(this.model.position.z, -10, 10);
+            this.model.position.x=clamp(this.model.position.x, -15, 15);
+            this.model.position.z=clamp1(this.model.position.z, -90, 13);
             console.log(this.model.position.x)
             this.updateCameraTarget(moveX, moveZ)
     
