@@ -144,6 +144,14 @@ export const cube=()=>{
     const cube = new THREE.Mesh( geometry, material );
     return cube
 }
+export const cubeInstanced=()=>{
+  const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+  const material = new THREE.MeshBasicMaterial( {wireframe:false} );
+
+  material.map=new THREE.TextureLoader().load('./model/eyes_diffuse_jpeg.jpg')
+  const cube = new THREE.InstancedMesh( geometry, material,3);
+  return cube
+}
 export const coneObject=()=>{
     const geometry = new THREE.ConeGeometry( 3, 10, 28 );
     const material = new THREE.MeshPhongMaterial( {color: 0x2D6A0A } );

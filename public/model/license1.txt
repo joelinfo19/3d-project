@@ -1,0 +1,11 @@
+Model Information:
+* title:	CORN MAZE-03
+* source:	https://sketchfab.com/3d-models/corn-maze-03-7202ca9cc0a04d73a801698f2bfd7d83
+* author:	psychopete (https://sketchfab.com/psychopete)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "CORN MAZE-03" (https://sketchfab.com/3d-models/corn-maze-03-7202ca9cc0a04d73a801698f2bfd7d83) by psychopete (https://sketchfab.com/psychopete) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

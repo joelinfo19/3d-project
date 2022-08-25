@@ -31,13 +31,17 @@ export class CharacterControls {
     walkVelocity = 2
     position= new THREE.Vector3(2,0.5,1) //position of danger cube
     dangerCubes
+    cube1
+    matrix=new THREE.Matrix4()
+    position1=new THREE.Vector3()
     // position.add()
 
-    constructor(model,mixer, animationsMap,orbitControl, camera,currentAction,dangerCubes) {
+    constructor(model,mixer, animationsMap,orbitControl, camera,currentAction,dangerCubes,cube) {
         this.model = model
         this.mixer = mixer
         this.animationsMap = animationsMap
         this.dangerCubes=dangerCubes
+        this.cube1=cube
         this.currentAction = currentAction
         this.animationsMap.forEach((value, key) => {
             if (key == currentAction) {
@@ -72,11 +76,18 @@ export class CharacterControls {
         }
         const newDistance=this.position.distanceToSquared(this.model.position)
 
-        // console.log(newDistance)
-        for(let i=0;i<this.dangerCubes.length;i++){
+        // console.log(this.dangerCubes.length)
+        for(let i=0;i<this.dangerCubes.count;i++){
             // console.log(this.dangerCubes[i].position.distanceToSquared(this.model.position))
-            if(this.dangerCubes[i].position.distanceToSquared(this.model.position)<2){
-                console.log('into')
+            this.dangerCubes.getMatrixAt( i, this.matrix );
+            this.position1.setFromMatrixPosition( this.matrix )
+            // console.log(position.setFromMatrixPosition( matrix ))
+            // console.log(this.position1.setFromMatrixPosition( this.matrix ))
+            if( this.position1.setFromMatrixPosition( this.matrix ).distanceToSquared(this.model.position)<2){
+                // console.log(this.dangerCubes[i].position.x)
+                // console.log(this.dangerCubes[i])
+                // console.log(this.position1.setFromMatrixPosition( this.matrix ))
+                
                 this.model.position.set(0,1.2,0)
                 play='idle'
                 // this.flag=false
@@ -131,19 +142,44 @@ export class CharacterControls {
             //add -
             
             console.log(this.currentAction)
-            if(newDistance<1){
-                // console.log(newDistance)
-                velocity=this.walkVelocity
-                
-            }
+            
             const moveX = -this.walkDirection.x * velocity * delta   
             const moveZ = -this.walkDirection.z * velocity * delta
             this.model.position.x += moveX
             // this.model.position.y=1
             this.model.position.z += moveZ
+            console.log(this.cube1)
+            if(newDistance<1.5&&this.model.position.x>=this.cube1.min.x&&this.model.position.x<=this.cube1.max.x){
+                // console.log(newDistance)
+                velocity=this.walkVelocity
+                // this.model.position.x=2
+                
+                const clamp = (num, min, max) => {
+                    if(num<=min+0.5){
+                        console.log("min")
+                        return Math.min(Math.min(num, max), min)
+                    }
+                    else{
+                        console.log("max")
+                        return Math.max(Math.max(num,max),min)
+                    }
+                    
+                    
+                };
+                this.model.position.x=clamp(this.model.position.x, this.cube1.min.x, this.cube1.max.x);
+            }
+            // console.log(newDistance)
+            // console.log(this.cube1.position.x)
             // console.log(this.position)
             // console.log(this.model.position)
-            
+            const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+            const clamp1 = (num, min, max) => Math.min(Math.max(num, min), max);
+            // const clamp = (num, min, max) => Math.min(Math.min(num, min), max);
+            // const clamp1 = (num, min, max) => Math.min(Math.min(num, min), max);
+
+            this.model.position.x=clamp(this.model.position.x, -30, 10);
+            this.model.position.z=clamp1(this.model.position.z, -10, 10);
+            console.log(this.model.position.x)
             this.updateCameraTarget(moveX, moveZ)
     
         
