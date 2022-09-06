@@ -149,7 +149,7 @@ export const cubeInstanced=()=>{
   const material = new THREE.MeshBasicMaterial( {wireframe:false} );
 
   material.map=new THREE.TextureLoader().load('./model/eye_sauron.jpg')
-  const cube = new THREE.InstancedMesh( geometry, material,20);
+  const cube = new THREE.InstancedMesh( geometry, material,5);
   return cube
 }
 export const cubeInstancedReduce=()=>{
@@ -162,12 +162,12 @@ export const cubeInstancedReduce=()=>{
 }
 export const coneObject=()=>{
     const geometry = new THREE.ConeGeometry( 3, 10, 28 );
-    const material = new THREE.MeshPhongMaterial( {color: 0x2D6A0A } );
+    const material = new THREE.MeshPhongMaterial( {color: 0xFF0000 } );
     const cone = new THREE.Mesh( geometry, material );
     return cone
 }
 export const light=()=>{
-    const ambientLight=new THREE.AmbientLight(0xffffff, 0.7)
+    const ambientLight=new THREE.AmbientLight(0xff0000, 0.7)
     // scene.add(ambientLight)
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 1)

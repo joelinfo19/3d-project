@@ -73,10 +73,12 @@ export const Scene=()=>{
         console.log(renderer.toneMapping)
         scene.add(ambientLight)
         scene.add(dirLight)
-        //sphere
-        // const geometrySphere = new THREE.SphereGeometry( 0.5, 32, 16 );
-        // const material = new THREE.MeshBasicMaterial( { color: 0xffff00 ,wireframe:true} );
-        // const sphere = new THREE.Mesh( geometrySphere, material );
+        const helper=new THREE.DirectionalLightHelper(dirLight,5)
+        scene.add(helper)
+        // sphere
+        const geometrySphere = new THREE.SphereGeometry( 0.5, 32, 16 );
+        const material = new THREE.MeshPhongMaterial( { color: 0xa904f6 ,wireframe:false} );
+        const sphere = new THREE.Mesh( geometrySphere, material );
 
         const [floor,floor2,...rest]=createFloor()
         const [floorTest]=createFloor2()
@@ -211,7 +213,7 @@ export const Scene=()=>{
             // cubes[i]=newCubeInstanced
         }
        
-        scene.add(newCubeInstanced)
+       scene.add(newCubeInstanced)
         
         const newCube=cube()
         newCube.position.z = 5;
@@ -221,7 +223,7 @@ export const Scene=()=>{
         let cube1BB=new THREE.Box3(new THREE.Vector3(),new THREE.Vector3())
         cube1BB.setFromObject(newCube2)
         // console.log(cube1BB)
-        scene.add(newCube)
+     //   scene.add(newCube)
         // scene.add(newCube2)
         // console.log(cubes[0])
         function anim(obj) {
@@ -304,7 +306,7 @@ export const Scene=()=>{
                 if(child.isMesh) child.castShadow=true   
             })
             console.log(model.position)
-            scene.add(model)
+           scene.add(model)
             mixer=new THREE.AnimationMixer(model)
             console.log(gltfAnimations)
             // const walk=keyboardPress()
@@ -333,7 +335,7 @@ export const Scene=()=>{
              model.position.z=-45
              model.rotateY(30* Math.PI/180)
              console.log(model.position)
-            scene.add(model)
+           scene.add(model)
 
         })
  
@@ -521,12 +523,14 @@ export const Scene=()=>{
     //     }
     //     cont--
     // }
-    // for(let i=0;i<20;i++){
-    //     const cone=coneObject()
-    //     cone.position.x+=i* Math.floor(Math.random() * 3) + -6
-    //     cone.position.z+=i* Math.floor(Math.random() * 3) + -6
-    //     scene.add(cone)
-    // }
+        // for(let i=0;i<4;i++){
+        //     const cone=coneObject()
+        //     cone.position.x+=3
+        //     cone.position.x+=i* 9
+        //     // cone.position.z+=i* Math.floor(Math.random() * 3) + -6
+        //     scene.add(cone)
+        // }
+
         // scene.add(floor2);
         // const star=drawStar(18.6,28.6,5,5,3)
         
@@ -535,6 +539,8 @@ export const Scene=()=>{
         // scene.add(star)
         // scene.add(newCube)
         // scene.add( sphere );
+        // sphere.position.set(0,0.5,0)
+
         // Cube.position.set(2,0.5,1)
         
         // scene.add(Cube)
@@ -574,17 +580,28 @@ export const Scene=()=>{
             // keyDisplayQueue.up(event.key);
             (map )[event.key.toLowerCase()] = false
         }, true);
-
+        let i=0
         const animate=()=>{
             const elapsedTime=clock.getElapsedTime()
             // star.rotateY(0.1)
             let mixerUpdateDelta = clock.getDelta();
+            // i+0.1
             // sphere.rotateY(0.004)
             // newCube.rotateY(0.004)
             // star.position.set(18.6,28.6,3.6)
             
             // let mixerTime=clock.getDelta()
             // mixerTime+=0.02
+            // if(sphere.position.x<4){
+                //movemente sphere last project
+            // if( sphere.position.x<50){
+            //     i=i+0.01
+            //     sphere.position.z -= Math.cos(i)/20;
+            //     sphere.position.x += 0.025
+            // }
+                
+            // }
+           
             // // cube.position.z=Math.sin(elapsedTime)
             // // loadedModel.=Math.sin(mixerTime)
             // // if(loadedModel){
